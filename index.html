@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>studying.works - AI-Powered Study Tools for Every Learner</title>
+    <meta name="description" content="Transform your learning with AI-powered flashcards, adaptive algorithms, and personalized study tools. Free, open-source, and built for students.">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="global-styles.css">
+    <link rel="stylesheet" href="apple-style.css">
+    <link rel="stylesheet" href="button-styles.css">
+    <link rel="stylesheet" href="loading-animations.css">
+
+    <style>
+        /* Hero section enhancements */
+        .hero-gradient-text {
+            background: linear-gradient(135deg, #ffffff 0%, #a78bfa 50%, #0ea5a4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.25rem;
+            line-height: 1.8;
+        }
+
+        /* 3D Card Effects */
+        .feature-card-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card-3d::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(168, 139, 250, 0.1) 0%, rgba(14, 165, 164, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .feature-card-3d:hover::before {
+            opacity: 1;
+        }
+
+        .feature-card-3d:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 60px rgba(168, 139, 250, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+            animation: float-slow 6s ease-in-out infinite;
+        }
+
+        @keyframes float-slow {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Stat cards */
+        .stat-card {
+            background: linear-gradient(135deg, rgba(168, 139, 250, 0.15) 0%, rgba(14, 165, 164, 0.15) 100%);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(168, 139, 250, 0.2);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #a78bfa 0%, #0ea5a4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, rgba(168, 139, 250, 0.1) 0%, rgba(14, 165, 164, 0.1) 100%);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 32px;
+            padding: 4rem 2rem;
+            text-align: center;
+            backdrop-filter: blur(20px);
+        }
+
+        /* Auth buttons */
+        .google-signin-btn {
+            background: linear-gradient(135deg, #a78bfa 0%, #6366f1 100%);
+            color: white;
+            padding: 1.25rem 3rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            border-radius: 16px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(168, 139, 250, 0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .google-signin-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(168, 139, 250, 0.5);
+        }
+
+        .google-signin-btn:active {
+            transform: translateY(-1px);
+        }
+
+        /* How it works steps */
+        .step-card {
+            background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 2rem;
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+
+        .step-number {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #a78bfa 0%, #0ea5a4 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            color: white;
+            font-size: 1.25rem;
+        }
+
+        /* Smooth scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Loading state */
+        .btn-loading {
+            opacity: 0.7;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* Floating shapes background */
+        .floating-shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.2;
+            animation: float 20s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(100px, -100px) rotate(120deg); }
+            66% { transform: translate(-100px, 100px) rotate(240deg); }
+        }
+    </style>
+</head>
+<body class="font-sans antialiased">
+    <!-- Floating Background Shapes -->
+    <div class="floating-shape" style="width: 400px; height: 400px; background: linear-gradient(135deg, #a78bfa, #6366f1); top: 10%; left: 10%; animation-delay: 0s;"></div>
+    <div class="floating-shape" style="width: 300px; height: 300px; background: linear-gradient(135deg, #0ea5a4, #134e4a); top: 50%; right: 10%; animation-delay: 5s;"></div>
+    <div class="floating-shape" style="width: 350px; height: 350px; background: linear-gradient(135deg, #a78bfa, #0ea5a4); bottom: 10%; left: 50%; animation-delay: 10s;"></div>
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 p-6 md:p-8" style="backdrop-filter: blur(20px); background: rgba(10, 10, 26, 0.8); border-bottom: 1px solid rgba(255,255,255,0.08);">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="/" class="text-2xl font-bold text-white flex items-center gap-2">
+                <span class="text-3xl">🎓</span>
+                <span>studying.works</span>
+            </a>
+            <nav class="hidden md:flex items-center gap-6">
+                <a href="#features" class="text-white/80 hover:text-white transition-colors">Features</a>
+                <a href="#how-it-works" class="text-white/80 hover:text-white transition-colors">How It Works</a>
+                <a href="about.html" class="text-white/80 hover:text-white transition-colors">About</a>
+                <button id="nav-signin-btn" class="px-6 py-2 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all hover:-translate-y-0.5">
+                    Sign In
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="min-h-screen flex items-center justify-center px-4 pt-24 pb-12">
+        <div class="max-w-6xl mx-auto text-center">
+            <!-- Eyebrow -->
+            <div class="mb-6 animate-fadeInUp">
+                <span class="inline-block px-4 py-2 rounded-full text-sm font-semibold"
+                      style="background: linear-gradient(135deg, rgba(168, 139, 250, 0.2), rgba(14, 165, 164, 0.2)); border: 1px solid rgba(168, 139, 250, 0.3); color: #a78bfa;">
+                    ✨ AI-Powered Learning Platform
+                </span>
+            </div>
+
+            <!-- Main Headline -->
+            <h1 class="text-5xl md:text-7xl font-black mb-6 hero-gradient-text animate-fadeInUp" style="animation-delay: 0.1s; line-height: 1.1;">
+                Studying built for<br>every kind of learner.
+            </h1>
+
+            <!-- Subtitle -->
+            <p class="hero-subtitle max-w-3xl mx-auto mb-12 animate-fadeInUp" style="animation-delay: 0.2s;">
+                Transform your study sessions with AI-powered flashcards, adaptive learning algorithms, and personalized practice.
+                <strong class="text-white">100% free</strong>, <strong class="text-white">open-source</strong>, and designed by students at UC Berkeley.
+            </p>
+
+            <!-- Auth Buttons -->
+            <div id="hero-auth-section" class="animate-fadeInUp" style="animation-delay: 0.3s;">
+                <div id="hero-auth-buttons">
+                    <button id="hero-google-signin-btn" class="google-signin-btn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                        </svg>
+                        Start Learning for Free
+                    </button>
+                    <div id="hero-enter-container" class="hidden">
+                        <button id="hero-enter-btn" class="google-signin-btn">
+                            👋 Welcome back — Enter Dashboard
+                        </button>
+                    </div>
+                </div>
+                <div id="hero-loading" class="hidden mt-8">
+                    <div class="loading-spinner mx-auto"></div>
+                    <p class="text-white/60 mt-4">Signing you in...</p>
+                </div>
+            </div>
+
+            <!-- Trust Indicators -->
+            <div class="mt-12 flex flex-wrap items-center justify-center gap-6 text-white/60 text-sm animate-fadeInUp" style="animation-delay: 0.4s;">
+                <div class="flex items-center gap-2">
+                    <span class="text-green-400">✓</span>
+                    <span>No credit card required</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-green-400">✓</span>
+                    <span>Free forever</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-green-400">✓</span>
+                    <span>Privacy-first design</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-24 px-4">
+        <div class="max-w-7xl mx-auto">
+            <!-- Section Header -->
+            <div class="text-center mb-16">
+                <span class="inline-block px-4 py-2 rounded-full text-sm font-semibold mb-4"
+                      style="background: linear-gradient(135deg, rgba(14, 165, 164, 0.2), rgba(168, 139, 250, 0.2)); border: 1px solid rgba(14, 165, 164, 0.3); color: #0ea5a4;">
+                    🚀 Powerful Tools
+                </span>
+                <h2 class="text-4xl md:text-5xl font-black text-white mb-4">
+                    Everything you need to <span class="hero-gradient-text">excel</span>
+                </h2>
+                <p class="text-xl text-white/70 max-w-2xl mx-auto">
+                    From AI-generated flashcards to adaptive learning algorithms, we've built the ultimate study toolkit.
+                </p>
+            </div>
+
+            <!-- Feature Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Feature 1: AI Flashcards -->
+                <div class="feature-card-3d">
+                    <div class="feature-icon">🤖</div>
+                    <h3 class="text-2xl font-bold text-white mb-3">AI-Powered Flashcards</h3>
+                    <p class="text-white/70 mb-4">
+                        Paste your notes and let our AI generate perfect flashcards instantly. Powered by advanced language models for accurate, context-aware cards.
+                    </p>
+                    <ul class="space-y-2 text-white/60 text-sm">
+                        <li class="flex items-center gap-2">
+                            <span class="text-green-400">✓</span>
+                            <span>Instant generation from any text</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-green-400">✓</span>
+                            <span>Smart Q&A formatting</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-green-400">✓</span>
+                            <span>Multi-language support</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Feature 2: Adaptive Learning -->
+                <div class="feature-card-3d">
+                    <div class="feature-icon">🧠</div>
+                    <h3 class="text-2xl font-bold text-white mb-3">Adaptive Learning</h3>
+                    <p class="text-white/70 mb-4">
+                        Our Bayesian Knowledge Tracing algorithm tracks your mastery with 92% accuracy, adapting to your learning curve in real-time.
+                    </p>
+                    <ul class="space-y-2 text-white/60 text-sm">
+                        <li class="flex items-center gap-2">
+                            <span class="text-green-400">✓</span>
+                            <span>92% accuracy tracking</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-green-400">✓</span>
+                            <span>Personalized difficulty</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-green-400">✓</span>
+                            <span>UC Berkeley research-backed</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Feature 3: SAT Practice -->
+                <div class="feature-card-3d">
+                    <div class="feature-icon">📚</div>
+                    <h3 class="text-2xl font-bold text-white mb-3">SAT Practice</h3>
+                    <p class="text-white/70 mb-4">
+                        Master the SAT with 2,017 real questions across 8 domains. Item Response Theory ensures optimal question selection.
+                    </p>
+                    <ul class="space-y-2 text-white/60 text-sm">
+                        <li class="flex items-center gap-2">
+                            <span class="text-green-400">✓</span>
+                            <span>2,017 real SAT questions</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-green-400">✓</span>
+                            <span>8 subject domains</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-green-400">✓</span>
+                            <span>Built-in graphing calculator</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Feature 4: Memory Games -->
+                <div class="feature-card-3d">
+                    <div class="feature-icon">🎮</div>
+                    <h3 class="text-2xl font-bold text-white mb-3">Memory Games</h3>
+                    <p class="text-white/70 mb-4">
+                        Make studying fun with interactive memory games. Turn any flashcard deck into an engaging learning experience.
+                    </p>
+                    <ul class="space-y-2 text-white/60 text-sm">
+                        <li class="flex items-center gap-2">
+                            <span class="text-green-400">✓</span>
+                            <span>Multiple game modes</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-green-400">✓</span>
+                            <span>Timed challenges</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-green-400">✓</span>
+                            <span>Score tracking</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Feature 5: Progress Analytics -->
+                <div class="feature-card-3d">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="text-2xl font-bold text-white mb-3">Progress Analytics</h3>
+                    <p class="text-white/70 mb-4">
+                        Visualize your learning journey with detailed analytics. See your mastery levels, study streaks, and improvement over time.
+                    </p>
+                    <ul class="space-y-2 text-white/60 text-sm">
+                        <li class="flex items-center gap-2">
+                            <span class="text-green-400">✓</span>
+                            <span>Mastery level tracking</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-green-400">✓</span>
+                            <span>Study streak counters</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-green-400">✓</span>
+                            <span>Performance insights</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Feature 6: Custom Study Tools -->
+                <div class="feature-card-3d">
+                    <div class="feature-icon">⚙️</div>
+                    <h3 class="text-2xl font-bold text-white mb-3">Custom Study Tools</h3>
+                    <p class="text-white/70 mb-4">
+                        Create your own flashcards, organize them into decks, and study your way. Full control over your learning materials.
+                    </p>
+                    <ul class="space-y-2 text-white/60 text-sm">
+                        <li class="flex items-center gap-2">
+                            <span class="text-green-400">✓</span>
+                            <span>Custom flashcard creation</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-green-400">✓</span>
+                            <span>Deck organization</span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-green-400">✓</span>
+                            <span>Import/export support</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-24 px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="stat-card">
+                    <div class="stat-number">100%</div>
+                    <h3 class="text-xl font-bold text-white mb-2">Free Forever</h3>
+                    <p class="text-white/60">No paywalls, no premium tiers. Everything is completely free.</p>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-number">2,017</div>
+                    <h3 class="text-xl font-bold text-white mb-2">SAT Questions</h3>
+                    <p class="text-white/60">Real practice questions across 8 subject domains.</p>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-number">92%</div>
+                    <h3 class="text-xl font-bold text-white mb-2">Accuracy</h3>
+                    <p class="text-white/60">Our BKT algorithm tracks your knowledge with precision.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="py-24 px-4">
+        <div class="max-w-7xl mx-auto">
+            <!-- Section Header -->
+            <div class="text-center mb-16">
+                <span class="inline-block px-4 py-2 rounded-full text-sm font-semibold mb-4"
+                      style="background: linear-gradient(135deg, rgba(168, 139, 250, 0.2), rgba(14, 165, 164, 0.2)); border: 1px solid rgba(168, 139, 250, 0.3); color: #a78bfa;">
+                    💡 Simple Process
+                </span>
+                <h2 class="text-4xl md:text-5xl font-black text-white mb-4">
+                    Start learning in <span class="hero-gradient-text">3 steps</span>
+                </h2>
+            </div>
+
+            <!-- Steps Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="text-center mt-4">
+                        <div class="text-5xl mb-4">🚀</div>
+                        <h3 class="text-xl font-bold text-white mb-3">Sign Up Free</h3>
+                        <p class="text-white/70">
+                            Create your account with Google in seconds. No credit card, no commitments.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="text-center mt-4">
+                        <div class="text-5xl mb-4">📝</div>
+                        <h3 class="text-xl font-bold text-white mb-3">Create or Import</h3>
+                        <p class="text-white/70">
+                            Generate flashcards with AI, create your own, or practice with our SAT question bank.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="text-center mt-4">
+                        <div class="text-5xl mb-4">🎯</div>
+                        <h3 class="text-xl font-bold text-white mb-3">Study Smarter</h3>
+                        <p class="text-white/70">
+                            Let our adaptive algorithm guide you. Watch your mastery grow with every session.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Values Section -->
+    <section class="py-24 px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="feature-card-3d text-center">
+                    <div class="text-5xl mb-4">🆓</div>
+                    <h3 class="text-2xl font-bold text-white mb-3">100% Free</h3>
+                    <p class="text-white/70">
+                        No hidden costs, no premium features. Everything is free because education should be accessible to everyone.
+                    </p>
+                </div>
+
+                <div class="feature-card-3d text-center">
+                    <div class="text-5xl mb-4">🔓</div>
+                    <h3 class="text-2xl font-bold text-white mb-3">Open Source</h3>
+                    <p class="text-white/70">
+                        Built transparently on GitHub. Community-driven development means the platform evolves with your needs.
+                    </p>
+                </div>
+
+                <div class="feature-card-3d text-center">
+                    <div class="text-5xl mb-4">🔒</div>
+                    <h3 class="text-2xl font-bold text-white mb-3">Privacy First</h3>
+                    <p class="text-white/70">
+                        Your data stays yours. We don't sell, share, or monetize your study habits. Ever.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA Section -->
+    <section class="py-24 px-4">
+        <div class="max-w-5xl mx-auto">
+            <div class="cta-section">
+                <div class="text-5xl mb-6">🎓</div>
+                <h2 class="text-4xl md:text-5xl font-black text-white mb-6">
+                    Ready to transform how you learn?
+                </h2>
+                <p class="text-xl text-white/70 mb-10 max-w-2xl mx-auto">
+                    Join thousands of students who are studying smarter with AI-powered tools. Get started in seconds.
+                </p>
+
+                <div id="cta-auth-section">
+                    <div id="cta-auth-buttons">
+                        <button id="cta-google-signin-btn" class="google-signin-btn">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                            </svg>
+                            Start Learning for Free
+                        </button>
+                        <div id="cta-enter-container" class="hidden">
+                            <button id="cta-enter-btn" class="google-signin-btn">
+                                👋 Welcome back — Enter Dashboard
+                            </button>
+                        </div>
+                    </div>
+                    <div id="cta-loading" class="hidden mt-8">
+                        <div class="loading-spinner mx-auto"></div>
+                        <p class="text-white/60 mt-4">Signing you in...</p>
+                    </div>
+                </div>
+
+                <p class="text-white/50 text-sm mt-6">No credit card required • Free forever • Cancel anytime</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="p-6 text-center" style="padding-top:80px;padding-bottom:80px;">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 text-left">
+                <!-- Column 1: Branding -->
+                <div class="col-span-1 md:col-span-2">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <span class="text-3xl">🎓</span>
+                        <span class="text-2xl font-bold text-white">studying.works</span>
+                    </div>
+                    <p class="text-white/70 mb-4">
+                        AI-powered study tools that adapt to your learning style. Built for students, by students at UC Berkeley.
+                    </p>
+                    <div class="flex gap-4">
+                        <a href="https://github.com/Benpitt/studying.works" target="_blank" rel="noopener noreferrer" class="text-white/70 hover:text-white transition-colors">
+                            <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Column 2: Product Links -->
+                <div>
+                    <h3 class="text-white font-bold mb-4">Product</h3>
+                    <ul class="space-y-2">
+                        <li><a href="dashboard.html" class="text-white/70 hover:text-white transition-colors">Dashboard</a></li>
+                        <li><a href="ai-flashcards.html" class="text-white/70 hover:text-white transition-colors">AI Generator</a></li>
+                        <li><a href="custom-flashcards.html" class="text-white/70 hover:text-white transition-colors">Flashcards</a></li>
+                        <li><a href="sat-practice.html" class="text-white/70 hover:text-white transition-colors">SAT Practice</a></li>
+                        <li><a href="memory-games.html" class="text-white/70 hover:text-white transition-colors">Memory Games</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 3: Company Links -->
+                <div>
+                    <h3 class="text-white font-bold mb-4">Company</h3>
+                    <ul class="space-y-2">
+                        <li><a href="about.html" class="text-white/70 hover:text-white transition-colors">About</a></li>
+                        <li><a href="privacy.html" class="text-white/70 hover:text-white transition-colors">Privacy</a></li>
+                        <li><a href="terms.html" class="text-white/70 hover:text-white transition-colors">Terms</a></li>
+                        <li><a href="community.html" class="text-white/70 hover:text-white transition-colors">Community</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Divider & Copyright -->
+            <div class="border-t border-white/10 pt-8 text-center text-white/60">
+                <p>&copy; 2025 studying.works. Built by Ben Hocquet</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD-2SELHboxELp2XLQIwstiI-pCaNcUDOA",
+            authDomain: "academie-9942b.firebaseapp.com",
+            projectId: "academie-9942b",
+            storageBucket: "academie-9942b.firebasestorage.app",
+            messagingSenderId: "1079518919325",
+            appId: "1:1079518919325:web:745025bdb7b2b23645b274"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
+
+        // Set persistence
+        setPersistence(auth, browserLocalPersistence);
+
+        // Auth state observer
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in
+                // Update all sign-in buttons to "Enter" buttons
+                document.getElementById('hero-google-signin-btn').classList.add('hidden');
+                document.getElementById('hero-enter-container').classList.remove('hidden');
+
+                document.getElementById('cta-google-signin-btn').classList.add('hidden');
+                document.getElementById('cta-enter-container').classList.remove('hidden');
+
+                // Update nav button
+                const navBtn = document.getElementById('nav-signin-btn');
+                navBtn.textContent = 'Dashboard';
+                navBtn.onclick = () => window.location.href = 'dashboard.html';
+
+                // Store user data
+                localStorage.setItem('userName', user.displayName || '');
+                localStorage.setItem('userEmail', user.email || '');
+                localStorage.setItem('userPhoto', user.photoURL || '');
+                localStorage.setItem('userId', user.uid);
+                localStorage.setItem('sessionTimestamp', Date.now().toString());
+            } else {
+                // User is signed out
+                document.getElementById('hero-google-signin-btn').classList.remove('hidden');
+                document.getElementById('hero-enter-container').classList.add('hidden');
+
+                document.getElementById('cta-google-signin-btn').classList.remove('hidden');
+                document.getElementById('cta-enter-container').classList.add('hidden');
+            }
+        });
+
+        // Sign in function
+        async function handleSignIn(buttonId, loadingId) {
+            const button = document.getElementById(buttonId);
+            const loading = document.getElementById(loadingId);
+
+            // Show loading state
+            button.parentElement.classList.add('hidden');
+            loading.classList.remove('hidden');
+
+            try {
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+
+                // Store user data
+                localStorage.setItem('userName', user.displayName || '');
+                localStorage.setItem('userEmail', user.email || '');
+                localStorage.setItem('userPhoto', user.photoURL || '');
+                localStorage.setItem('userId', user.uid);
+                localStorage.setItem('sessionTimestamp', Date.now().toString());
+
+                // Redirect to dashboard
+                window.location.href = 'dashboard.html';
+            } catch (error) {
+                console.error('Sign-in error:', error);
+
+                // Show error message
+                loading.classList.add('hidden');
+                button.parentElement.classList.remove('hidden');
+
+                // Create error toast
+                showToast('Sign-in failed. Please try again.', 'error');
+            }
+        }
+
+        // Enter dashboard function (for already signed-in users)
+        function enterDashboard() {
+            window.location.href = 'dashboard.html';
+        }
+
+        // Toast notification function
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 16px 24px;
+                background: linear-gradient(135deg, rgba(239, 68, 68, 0.9), rgba(220, 38, 38, 0.9));
+                color: white;
+                border-radius: 12px;
+                font-weight: 600;
+                z-index: 9999;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+                animation: slideIn 0.3s ease;
+            `;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // Attach event listeners
+        document.getElementById('hero-google-signin-btn').addEventListener('click', () => handleSignIn('hero-google-signin-btn', 'hero-loading'));
+        document.getElementById('cta-google-signin-btn').addEventListener('click', () => handleSignIn('cta-google-signin-btn', 'cta-loading'));
+        document.getElementById('nav-signin-btn').addEventListener('click', () => handleSignIn('hero-google-signin-btn', 'hero-loading'));
+
+        document.getElementById('hero-enter-btn').addEventListener('click', enterDashboard);
+        document.getElementById('cta-enter-btn').addEventListener('click', enterDashboard);
+
+        // Add smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+
+    <!-- Dynamic Gradient Script -->
+    <script type="module" src="dynamic-gradient.js"></script>
+
+    <!-- Add slide animations for toast -->
+    <style>
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        /* Add 3D tilt effect on hover */
+        .feature-card-3d {
+            perspective: 1000px;
+        }
+    </style>
+
+    <!-- 3D Card Tilt Effect -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.feature-card-3d');
+
+            cards.forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = (e.clientX - rect.left) / rect.width;
+                    const y = (e.clientY - rect.top) / rect.height;
+
+                    const rotateY = (x - 0.5) * 10;
+                    const rotateX = (y - 0.5) * -10;
+
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px) scale(1.02)`;
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0) scale(1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
