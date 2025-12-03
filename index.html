@@ -103,9 +103,6 @@
             background-clip:text;
             animation:fadeInScale 1s ease-out 0.2s backwards;
             min-height: 2.2em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         @keyframes fadeInScale{
@@ -369,7 +366,7 @@
             </header>
 
             <!-- Hero Section -->
-            <section class="hero-section">
+            <section class="hero-section" style="background: linear-gradient(180deg, rgba(88,28,135,0.3) 0%, rgba(124,58,237,0.2) 50%, rgba(168,85,247,0.15) 100%);">
                 <div class="hero-content">
                     <div class="eyebrow">AI-Powered Learning Platform</div>
                     <h1 class="hero-headline">Built for <span id="typewriter-text"></span><span class="typewriter-cursor"></span></h1>
@@ -403,7 +400,7 @@
             </section>
 
             <!-- Feature 1: Smart Predictions -->
-            <section id="feature1" class="feature-section" style="background:linear-gradient(180deg, rgba(124,58,237,0.08), transparent);">
+            <section id="feature1" class="feature-section" style="background: linear-gradient(180deg, rgba(168,85,247,0.15) 0%, rgba(168,85,247,0.25) 50%, rgba(236,72,153,0.2) 100%);">
                 <div class="glow-orb" style="width: 400px; height: 400px; background: #a855f7; top: 20%; left: -10%;"></div>
                 <div class="feature-container">
                     <div class="feature-text">
@@ -423,7 +420,7 @@
             </section>
 
             <!-- Feature 2: Adaptive Learning -->
-            <section class="feature-section" style="background:linear-gradient(180deg, transparent, rgba(236,72,153,0.08), transparent);">
+            <section class="feature-section" style="background: linear-gradient(180deg, rgba(236,72,153,0.2) 0%, rgba(236,72,153,0.3) 50%, rgba(245,158,11,0.2) 100%);">
                 <div class="glow-orb" style="width: 450px; height: 450px; background: #ec4899; top: 30%; right: -10%; animation-delay: 1s;"></div>
                 <div class="feature-container">
                     <div class="feature-visual" style="order:0;">
@@ -443,7 +440,7 @@
             </section>
 
             <!-- Feature 3: AI Generation -->
-            <section class="feature-section" style="background:linear-gradient(180deg, transparent, rgba(99,102,241,0.08));">
+            <section class="feature-section" style="background: linear-gradient(180deg, rgba(245,158,11,0.2) 0%, rgba(99,102,241,0.25) 50%, rgba(67,56,202,0.2) 100%);">
                 <div class="glow-orb" style="width: 400px; height: 400px; background: #6366f1; bottom: 20%; left: 10%; animation-delay: 2s;"></div>
                 <div class="feature-container">
                     <div class="feature-text">
@@ -463,8 +460,21 @@
             </section>
 
             <!-- Footer -->
-            <footer class="p-6 text-center" style="padding:80px 20px;">
-                <p class="text-white/60 text-sm">Built by Ben Hocquet</p>
+            <footer class="bg-black/30 backdrop-blur-lg border-t border-white/10 py-8 mt-16">
+                <div class="max-w-7xl mx-auto px-4 text-center">
+                    <p class="text-white/60 mb-4">© 2025 studying.works. All rights reserved.</p>
+                    <div class="flex flex-col md:flex-row justify-center items-center space-y-2 md:space-y-0 md:space-x-6 mb-4">
+                        <a href="dashboard" class="text-white/80 hover:text-white transition-all font-medium">🎓 Dashboard</a>
+                        <a href="ai-flashcards" class="text-white/80 hover:text-white transition-all font-medium">🤖 AI Generator</a>
+                        <a href="custom-flashcards" class="text-white/80 hover:text-white transition-all font-medium">🎴 My Flashcards</a>
+                        <a href="community" class="text-white/80 hover:text-white transition-all font-medium">🌍 Community</a>
+                    </div>
+                    <div class="flex justify-center space-x-6 text-sm">
+                        <a href="terms" class="text-white/60 hover:text-white transition-all">Terms of Service</a>
+                        <a href="privacy" class="text-white/60 hover:text-white transition-all">Privacy Policy</a>
+                        <a href="about" class="text-white/60 hover:text-white transition-all">About</a>
+                    </div>
+                </div>
             </footer>
         </div>
     </div>
