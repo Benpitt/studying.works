@@ -647,33 +647,19 @@
         </div>
     </footer>
 
-    <!-- Firebase SDK -->
+    <!-- Firebase Authentication using Auth Service -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-        import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+        import { authService } from './auth-service.js';
+        import { firebaseConfig } from './config.js';
 
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyD-2SELHboxELp2XLQIwstiI-pCaNcUDOA",
-            authDomain: "academie-9942b.firebaseapp.com",
-            projectId: "academie-9942b",
-            storageBucket: "academie-9942b.firebasestorage.app",
-            messagingSenderId: "1079518919325",
-            appId: "1:1079518919325:web:745025bdb7b2b23645b274"
-        };
-
-        // Initialize Firebase
+        // Initialize Firebase and Auth Service
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
-        provider.setCustomParameters({ prompt: 'select_account' });
+        await authService.initializeAuth(app);
 
-        // Set persistence
-        setPersistence(auth, browserLocalPersistence);
-
-        // Auth state observer
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
+        // Set up auth state observer
+        authService.onAuthStateChange((user, isAuthenticated) => {
+            if (isAuthenticated && user) {
                 // User is signed in
                 // Update all sign-in buttons to "Enter" buttons
                 document.getElementById('hero-google-signin-btn').classList.add('hidden');
@@ -686,13 +672,6 @@
                 const navBtn = document.getElementById('nav-signin-btn');
                 navBtn.textContent = 'Dashboard';
                 navBtn.onclick = () => window.location.href = 'dashboard.html';
-
-                // Store user data
-                localStorage.setItem('userName', user.displayName || '');
-                localStorage.setItem('userEmail', user.email || '');
-                localStorage.setItem('userPhoto', user.photoURL || '');
-                localStorage.setItem('userId', user.uid);
-                localStorage.setItem('sessionTimestamp', Date.now().toString());
             } else {
                 // User is signed out
                 document.getElementById('hero-google-signin-btn').classList.remove('hidden');
@@ -713,18 +692,13 @@
             loading.classList.remove('hidden');
 
             try {
-                const result = await signInWithPopup(auth, provider);
-                const user = result.user;
+                // Use auth service for sign in
+                const user = await authService.signInWithGoogle();
 
-                // Store user data
-                localStorage.setItem('userName', user.displayName || '');
-                localStorage.setItem('userEmail', user.email || '');
-                localStorage.setItem('userPhoto', user.photoURL || '');
-                localStorage.setItem('userId', user.uid);
-                localStorage.setItem('sessionTimestamp', Date.now().toString());
-
-                // Redirect to dashboard
-                window.location.href = 'dashboard.html';
+                if (user) {
+                    // Redirect to dashboard
+                    window.location.href = 'dashboard.html';
+                }
             } catch (error) {
                 console.error('Sign-in error:', error);
 
