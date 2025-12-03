@@ -241,7 +241,7 @@
             <!-- Subtitle -->
             <p class="hero-subtitle max-w-3xl mx-auto mb-12 animate-fadeInUp" style="animation-delay: 0.2s;">
                 Transform your study sessions with AI-powered flashcards, adaptive learning algorithms, and personalized practice.
-                <strong class="text-white">100% free</strong>, <strong class="text-white">open-source</strong>, and designed by students at UC Berkeley.
+                <strong class="text-white">100% free</strong>, <strong class="text-white">open-source</strong>, and built with passion by students.
             </p>
 
             <!-- Auth Buttons -->
@@ -287,7 +287,7 @@
     </section>
 
     <!-- Features Section -->
-    <section id="features" class="py-24 px-4">
+    <section id="features" class="py-12 px-4">
         <div class="max-w-7xl mx-auto">
             <!-- Section Header -->
             <div class="text-center mb-16">
@@ -346,7 +346,7 @@
                         </li>
                         <li class="flex items-center gap-2">
                             <span class="text-green-400">✓</span>
-                            <span>UC Berkeley research-backed</span>
+                            <span>Research-backed algorithm</span>
                         </li>
                     </ul>
                 </div>
@@ -447,7 +447,7 @@
     </section>
 
     <!-- Stats Section -->
-    <section class="py-24 px-4">
+    <section class="py-12 px-4">
         <div class="max-w-7xl mx-auto">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div class="stat-card">
@@ -472,7 +472,7 @@
     </section>
 
     <!-- How It Works Section -->
-    <section id="how-it-works" class="py-24 px-4">
+    <section id="how-it-works" class="py-12 px-4">
         <div class="max-w-7xl mx-auto">
             <!-- Section Header -->
             <div class="text-center mb-16">
@@ -524,7 +524,7 @@
     </section>
 
     <!-- Values Section -->
-    <section class="py-24 px-4">
+    <section class="py-12 px-4">
         <div class="max-w-7xl mx-auto">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div class="feature-card-3d text-center">
@@ -555,7 +555,7 @@
     </section>
 
     <!-- Final CTA Section -->
-    <section class="py-24 px-4">
+    <section class="py-12 px-4">
         <div class="max-w-5xl mx-auto">
             <div class="cta-section">
                 <div class="text-5xl mb-6">🎓</div>
@@ -605,7 +605,7 @@
                         <span class="text-2xl font-bold text-white">studying.works</span>
                     </div>
                     <p class="text-white/70 mb-4">
-                        AI-powered study tools that adapt to your learning style. Built for students, by students at UC Berkeley.
+                        AI-powered study tools that adapt to your learning style. Built for students, by students.
                     </p>
                     <div class="flex gap-4">
                         <a href="https://github.com/Benpitt/studying.works" target="_blank" rel="noopener noreferrer" class="text-white/70 hover:text-white transition-colors">
@@ -816,6 +816,48 @@
                 });
             });
         });
+    </script>
+
+    <!-- Parallax Gradient Shift on Scroll -->
+    <script>
+        let ticking = false;
+
+        function updateGradientPosition() {
+            const scrollY = window.scrollY;
+            const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPercent = Math.min(scrollY / maxScroll, 1);
+
+            // Get floating shapes
+            const shapes = document.querySelectorAll('.floating-shape');
+
+            // Shift shapes based on scroll with different speeds for parallax effect
+            shapes.forEach((shape, index) => {
+                const speed = (index + 1) * 0.3; // Different speeds for each shape
+                const translateY = scrollPercent * 200 * speed; // Move down as we scroll
+                const translateX = scrollPercent * 100 * (index % 2 === 0 ? 1 : -1) * speed; // Alternate directions
+
+                shape.style.transform = `translate(${translateX}px, ${translateY}px)`;
+            });
+
+            // Update background gradient position for subtle shift
+            const gradientShift = scrollPercent * 30; // Shift by max 30%
+            document.body.style.backgroundPosition = `${gradientShift}% ${50 + gradientShift}%`;
+
+            ticking = false;
+        }
+
+        function requestTick() {
+            if (!ticking) {
+                window.requestAnimationFrame(updateGradientPosition);
+                ticking = true;
+            }
+        }
+
+        // Listen to scroll events with throttling
+        window.addEventListener('scroll', requestTick, { passive: true });
+
+        // Initial call
+        updateGradientPosition();
     </script>
 </body>
 </html>
