@@ -17,17 +17,49 @@
     <script type="module" src="auth-guard.js"></script>
 
     <!-- Navbar -->
-    <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 bg-black/30 backdrop-blur-md border-b border-white/10">
+    <nav class="bg-black/30 backdrop-blur-lg border-b border-white/10 fixed top-0 left-0 right-0 z-50 animate-slide-in">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
+            <div class="flex items-center justify-between h-16">
                 <div class="flex items-center space-x-8">
-                    <a href="dashboard" class="text-2xl font-black bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 text-transparent bg-clip-text hover:scale-110 transition-transform">
-                        studying.works
+                    <a href="dashboard" class="text-2xl font-bold text-white flex items-center space-x-2 hover:scale-105 transition-transform">
+                        <span>🎓</span>
+                        <span>studying.works</span>
                     </a>
+                    <div class="hidden md:flex space-x-4">
+                        <a href="dashboard" class="text-white/80 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg transition-all">Dashboard</a>
+                        <a href="progress" class="text-white/80 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg transition-all">Progress</a>
+                        <a href="about" class="text-white/80 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg transition-all">About</a>
+                    </div>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <a href="dashboard" class="text-white/80 hover:text-white transition-all hover:scale-105">Dashboard</a>
-                    <div id="userMenuPlaceholder"></div>
+                    <div class="hidden md:flex items-center space-x-2 bg-red-500/20 px-4 py-2 rounded-full border border-red-500/50">
+                        <span class="text-2xl animate-pulse-custom">🔥</span>
+                        <span class="text-white font-bold"><span id="streak">0</span> Day Streak</span>
+                    </div>
+                    <div class="relative group">
+                        <button class="flex items-center space-x-3 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full transition-all">
+                            <img id="user-photo" src="https://via.placeholder.com/40" alt="User profile photo" class="w-8 h-8 rounded-full" loading="lazy">
+                            <span id="user-name-nav" class="text-white font-semibold hidden md:block">User</span>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                            <div class="p-4">
+                                <p id="user-email" class="text-sm text-gray-600 mb-3 break-words overflow-wrap"></p>
+                                <div class="space-y-2 mb-3">
+                                    <a href="tutorial" class="flex items-center space-x-2 w-full text-left px-4 py-2 text-gray-700 hover:bg-purple-50 rounded-lg transition-all">
+                                        <span>📚</span>
+                                        <span>Tutorial</span>
+                                    </a>
+                                    <a href="settings" class="flex items-center space-x-2 w-full text-left px-4 py-2 text-gray-700 hover:bg-blue-50 rounded-lg transition-all">
+                                        <span>⚙️</span>
+                                        <span>Settings</span>
+                                    </a>
+                                </div>
+                                <button id="signout-btn" class="w-full bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-semibold transition-all">
+                                    Sign Out
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -181,10 +213,47 @@
     <script>
         let currentLesson = null;
         let currentLessonId = null;
+        let currentPage = 0; // 0-based index for lessons, last page is practice questions
 
         // Initialize
         async function init() {
             await loadLessons();
+            await loadUserData();
+        }
+
+        // Load user data for navbar
+        async function loadUserData() {
+            try {
+                const authService = window.authService;
+                if (authService && authService.currentUser) {
+                    const user = authService.currentUser;
+
+                    // Update user info in navbar
+                    const userPhoto = document.getElementById('user-photo');
+                    const userName = document.getElementById('user-name-nav');
+                    const userEmail = document.getElementById('user-email');
+
+                    if (userPhoto && user.photoURL) userPhoto.src = user.photoURL;
+                    if (userName) userName.textContent = user.displayName || 'User';
+                    if (userEmail) userEmail.textContent = user.email;
+                }
+
+                // Load streak
+                const streak = localStorage.getItem('currentStreak') || 0;
+                const streakElem = document.getElementById('streak');
+                if (streakElem) streakElem.textContent = streak;
+
+                // Setup signout button
+                const signoutBtn = document.getElementById('signout-btn');
+                if (signoutBtn) {
+                    signoutBtn.addEventListener('click', async () => {
+                        await window.authService.signOut();
+                        window.location.href = '/';
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+            }
         }
 
         // Load all lessons
@@ -378,8 +447,9 @@ Return ONLY the JSON object, no markdown formatting or code blocks.`;
         }
 
         // View a lesson
-        async function viewLesson(lessonId) {
+        async function viewLesson(lessonId, page = 0) {
             currentLessonId = lessonId;
+            currentPage = page;
             const lesson = await window.lessonsStorage.getLesson(lessonId);
 
             if (!lesson) {
@@ -394,45 +464,113 @@ Return ONLY the JSON object, no markdown formatting or code blocks.`;
             document.getElementById('createView').classList.add('hidden');
             document.getElementById('lessonView').classList.remove('hidden');
 
-            // Render lesson content
-            const contentDiv = document.getElementById('lessonContent');
+            // Render current page
+            renderLessonPage();
+        }
 
-            let html = `
+        // Render the current lesson page
+        function renderLessonPage() {
+            const contentDiv = document.getElementById('lessonContent');
+            const lesson = currentLesson;
+            const totalLessons = lesson.lessons.length;
+            const totalPages = totalLessons + (lesson.practiceQuestions?.length > 0 ? 1 : 0);
+
+            let html = '';
+
+            // Header
+            html += `
                 <div class="card-gradient-indigo rounded-2xl p-8 mb-6 animate-slide-in">
                     <h1 class="text-4xl font-black text-white mb-2">${escapeHtml(lesson.subject)}</h1>
                     <p class="text-white/60">Created ${formatDate(lesson.createdAt)}</p>
+                    <div class="mt-4 flex items-center gap-2">
+                        ${Array.from({length: totalPages}, (_, i) => `
+                            <div class="h-2 ${i === currentPage ? 'w-8 bg-white' : 'w-2 bg-white/30'} rounded-full transition-all"></div>
+                        `).join('')}
+                    </div>
                 </div>
             `;
 
-            // Render lessons
-            lesson.lessons.forEach((lessonItem, index) => {
+            // Render based on current page
+            if (currentPage < totalLessons) {
+                // Render individual lesson
+                const lessonItem = lesson.lessons[currentPage];
                 const gradients = ['purple', 'blue', 'emerald', 'rose'];
-                const gradient = gradients[index % gradients.length];
+                const gradient = gradients[currentPage % gradients.length];
 
                 html += `
-                    <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 animate-slide-in delay-${index * 100}">
-                        <h2 class="text-3xl font-bold text-white mb-6">${escapeHtml(lessonItem.title)}</h2>
+                    <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 mb-6 animate-slide-in">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <p class="text-white/60 text-sm mb-1">Lesson ${currentPage + 1} of ${totalLessons}</p>
+                                <h2 class="text-3xl font-bold text-white">${escapeHtml(lessonItem.title)}</h2>
+                            </div>
+                        </div>
                         <div class="space-y-4">
                             ${renderLessonContent(lessonItem.content)}
                         </div>
                     </div>
                 `;
-            });
-
-            // Render practice questions
-            if (lesson.practiceQuestions && lesson.practiceQuestions.length > 0) {
-                html += `
-                    <div class="card-gradient-fire rounded-2xl p-8 animate-slide-in delay-300">
-                        <h2 class="text-3xl font-bold text-white mb-2">Practice Questions</h2>
-                        <p class="text-white/70 mb-6">Test your understanding</p>
-                        <div class="space-y-6">
-                            ${renderPracticeQuestions(lesson.practiceQuestions)}
+            } else {
+                // Render practice questions
+                if (lesson.practiceQuestions && lesson.practiceQuestions.length > 0) {
+                    html += `
+                        <div class="card-gradient-fire rounded-2xl p-8 mb-6 animate-slide-in">
+                            <h2 class="text-3xl font-bold text-white mb-2">Practice Questions</h2>
+                            <p class="text-white/70 mb-6">Test your understanding of all ${totalLessons} lesson${totalLessons !== 1 ? 's' : ''}</p>
+                            <div class="space-y-6">
+                                ${renderPracticeQuestions(lesson.practiceQuestions)}
+                            </div>
                         </div>
-                    </div>
-                `;
+                    `;
+                }
             }
 
+            // Navigation buttons
+            html += `
+                <div class="flex items-center justify-between mt-8">
+                    <button
+                        onclick="navigatePage(-1)"
+                        class="btn-secondary flex items-center gap-2 ${currentPage === 0 ? 'opacity-50 cursor-not-allowed' : ''}"
+                        ${currentPage === 0 ? 'disabled' : ''}
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                        Previous
+                    </button>
+
+                    <div class="text-white/60 text-sm">
+                        ${currentPage < totalLessons ? `Lesson ${currentPage + 1} of ${totalLessons}` : 'Practice Questions'}
+                    </div>
+
+                    <button
+                        onclick="navigatePage(1)"
+                        class="btn-primary flex items-center gap-2 ${currentPage >= totalPages - 1 ? 'opacity-50 cursor-not-allowed' : ''}"
+                        ${currentPage >= totalPages - 1 ? 'disabled' : ''}
+                    >
+                        ${currentPage >= totalPages - 1 ? 'Completed' : (currentPage === totalLessons - 1 ? 'Practice Questions' : 'Next')}
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+            `;
+
             contentDiv.innerHTML = html;
+            window.scrollTo(0, 0);
+        }
+
+        // Navigate between pages
+        function navigatePage(direction) {
+            const totalLessons = currentLesson.lessons.length;
+            const totalPages = totalLessons + (currentLesson.practiceQuestions?.length > 0 ? 1 : 0);
+
+            const newPage = currentPage + direction;
+
+            if (newPage >= 0 && newPage < totalPages) {
+                currentPage = newPage;
+                renderLessonPage();
+            }
         }
 
         // Render lesson content
