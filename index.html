@@ -104,6 +104,8 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            background-size: 200% 200%;
+            transition: background-position 0.3s ease-out;
         }
 
         /* CTA Section */
@@ -195,6 +197,53 @@
             0%, 100% { transform: translate(0, 0) rotate(0deg); }
             33% { transform: translate(100px, -100px) rotate(120deg); }
             66% { transform: translate(-100px, 100px) rotate(240deg); }
+        }
+
+        /* Page intro animation */
+        body {
+            animation: pageIntro 1.2s ease-out;
+        }
+
+        @keyframes pageIntro {
+            0% {
+                opacity: 0;
+                transform: scale(0.98);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Curtain reveal effect */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, #0a0a1a, #1e1b4b);
+            z-index: 10000;
+            pointer-events: none;
+            animation: curtainReveal 1s ease-out forwards;
+        }
+
+        @keyframes curtainReveal {
+            0% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+        }
+
+        /* Gradient text with dynamic shift */
+        .hero-gradient-text {
+            background-size: 200% 200%;
+            transition: background-position 0.3s ease-out;
         }
     </style>
 </head>
@@ -842,6 +891,21 @@
             // Update background gradient position for subtle shift
             const gradientShift = scrollPercent * 30; // Shift by max 30%
             document.body.style.backgroundPosition = `${gradientShift}% ${50 + gradientShift}%`;
+
+            // Shift gradient text elements
+            const gradientTexts = document.querySelectorAll('.hero-gradient-text');
+            gradientTexts.forEach(text => {
+                // Shift the gradient background position for a flowing effect
+                const textGradientShift = scrollPercent * 100; // Move gradient across the text
+                text.style.backgroundPosition = `${textGradientShift}% 50%`;
+            });
+
+            // Also apply to stat numbers
+            const statNumbers = document.querySelectorAll('.stat-number');
+            statNumbers.forEach(stat => {
+                const statGradientShift = scrollPercent * 100;
+                stat.style.backgroundPosition = `${statGradientShift}% 50%`;
+            });
 
             ticking = false;
         }
