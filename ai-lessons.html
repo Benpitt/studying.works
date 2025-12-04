@@ -132,7 +132,33 @@
                                 class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all"
                             >
                         </div>
-                        <div class="mb-6">
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-white/80 mb-2 font-medium">Difficulty Level</label>
+                                <select
+                                    id="lessonDifficulty"
+                                    class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all"
+                                >
+                                    <option value="beginner">Beginner</option>
+                                    <option value="intermediate" selected>Intermediate</option>
+                                    <option value="advanced">Advanced</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-white/80 mb-2 font-medium">Estimated Time (minutes)</label>
+                                <input
+                                    type="number"
+                                    id="lessonTime"
+                                    placeholder="30"
+                                    min="5"
+                                    max="300"
+                                    class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all"
+                                >
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
                             <label class="block text-white/80 mb-2 font-medium">Your Notes</label>
                             <textarea
                                 id="lessonNotes"
@@ -141,6 +167,21 @@
                                 class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all resize-none"
                             ></textarea>
                         </div>
+
+                        <div class="mb-6 bg-white/5 rounded-xl p-4 border border-white/10">
+                            <label class="flex items-center space-x-3 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    id="includeImages"
+                                    class="w-5 h-5 rounded bg-white/10 border-white/20 text-blue-500 focus:ring-2 focus:ring-blue-400"
+                                >
+                                <div>
+                                    <span class="text-white font-medium">Include image URLs</span>
+                                    <p class="text-white/60 text-sm">Ask AI to suggest relevant image URLs to enhance the lesson</p>
+                                </div>
+                            </label>
+                        </div>
+
                         <button onclick="generatePrompt()" class="btn-primary w-full">
                             Generate AI Prompt
                         </button>
@@ -279,13 +320,22 @@
                 const gradient = gradients[index % gradients.length];
                 const lessonCount = lesson.lessons?.length || 0;
                 const questionCount = lesson.practiceQuestions?.length || 0;
+                const metadata = lesson.metadata || {};
 
                 return `
                     <div class="card-gradient-${gradient} rounded-2xl p-6 card-hover relative overflow-hidden group cursor-pointer animate-slide-in delay-${Math.min(index * 100, 500)}" onclick="viewLesson('${lesson.id}')">
                         <div class="absolute inset-0 shimmer opacity-0 group-hover:opacity-100"></div>
                         <div class="relative z-10">
-                            <h3 class="text-xl font-bold text-white mb-2">${escapeHtml(lesson.subject)}</h3>
-                            <p class="text-white/70 text-sm mb-4">${lessonCount} lesson${lessonCount !== 1 ? 's' : ''} • ${questionCount} practice question${questionCount !== 1 ? 's' : ''}</p>
+                            <div class="flex items-start justify-between mb-2">
+                                <h3 class="text-xl font-bold text-white">${escapeHtml(lesson.subject)}</h3>
+                                ${metadata.difficulty ? `
+                                <span class="px-2 py-1 bg-white/20 rounded text-white text-xs font-medium capitalize">
+                                    ${metadata.difficulty}
+                                </span>` : ''}
+                            </div>
+                            <p class="text-white/70 text-sm mb-2">${lessonCount} lesson${lessonCount !== 1 ? 's' : ''} • ${questionCount} practice question${questionCount !== 1 ? 's' : ''}</p>
+                            ${metadata.estimatedTime ? `
+                            <p class="text-white/60 text-xs mb-2">⏱️ ${metadata.estimatedTime} minutes</p>` : ''}
                             <div class="text-white/50 text-xs">
                                 Created ${formatDate(lesson.createdAt)}
                             </div>
@@ -321,15 +371,33 @@
         function generatePrompt() {
             const subject = document.getElementById('lessonSubject').value.trim();
             const notes = document.getElementById('lessonNotes').value.trim();
+            const difficulty = document.getElementById('lessonDifficulty').value;
+            const time = document.getElementById('lessonTime').value;
+            const includeImages = document.getElementById('includeImages').checked;
 
             if (!subject || !notes) {
                 alert('Please fill in both subject and notes');
                 return;
             }
 
+            const imageInstructions = includeImages ? `
+        {
+          "type": "image",
+          "url": "https://example.com/relevant-image.jpg",
+          "alt": "Description of the image"
+        },` : '';
+
+            const imageGuidelines = includeImages ? `
+- Include relevant image URLs using the "image" content type
+- Images should be educational and directly related to the topic
+- Provide descriptive alt text for each image
+- Use high-quality, reliable image sources when possible` : '';
+
             const prompt = `Create a comprehensive educational lesson based on the following notes. Return ONLY valid JSON with no additional text or formatting.
 
 Subject: ${subject}
+Difficulty Level: ${difficulty}${time ? `
+Estimated Time: ${time} minutes` : ''}
 
 Notes:
 ${notes}
@@ -337,6 +405,12 @@ ${notes}
 Generate a JSON object with this exact structure:
 {
   "subject": "${subject}",
+  "metadata": {
+    "difficulty": "${difficulty}",
+    "estimatedTime": ${time || 30},
+    "prerequisites": ["Prerequisite 1", "Prerequisite 2"],
+    "learningObjectives": ["What students will learn 1", "What students will learn 2", "What students will learn 3"]
+  },
   "lessons": [
     {
       "title": "Lesson title",
@@ -356,7 +430,7 @@ Generate a JSON object with this exact structure:
         {
           "type": "highlight",
           "text": "Important concept to remember"
-        }
+        }${imageInstructions}
       ]
     }
   ],
@@ -372,9 +446,12 @@ Generate a JSON object with this exact structure:
 
 Guidelines:
 - Create 2-4 comprehensive lessons that build on each other
+- Adjust complexity based on the ${difficulty} difficulty level
 - Each lesson should have clear sections with headings
 - Use bullet points for lists and key concepts
-- Highlight important information
+- Highlight important information${imageGuidelines}
+- Include 2-4 prerequisites that students should know beforehand
+- Define 3-5 clear learning objectives
 - Create 5-10 practice questions that test understanding
 - Questions should range from basic recall to application
 - Include detailed explanations for answers
@@ -477,11 +554,52 @@ Return ONLY the JSON object, no markdown formatting or code blocks.`;
 
             let html = '';
 
-            // Header
+            // Header with metadata
+            const metadata = lesson.metadata || {};
             html += `
                 <div class="card-gradient-indigo rounded-2xl p-8 mb-6 animate-slide-in">
                     <h1 class="text-4xl font-black text-white mb-2">${escapeHtml(lesson.subject)}</h1>
-                    <p class="text-white/60">Created ${formatDate(lesson.createdAt)}</p>
+                    <p class="text-white/60 mb-4">Created ${formatDate(lesson.createdAt)}</p>
+
+                    ${metadata.difficulty || metadata.estimatedTime ? `
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        ${metadata.difficulty ? `
+                        <span class="px-3 py-1 bg-white/20 rounded-full text-white text-sm font-medium capitalize">
+                            ${metadata.difficulty}
+                        </span>` : ''}
+                        ${metadata.estimatedTime ? `
+                        <span class="px-3 py-1 bg-white/20 rounded-full text-white text-sm font-medium">
+                            ⏱️ ${metadata.estimatedTime} min
+                        </span>` : ''}
+                    </div>` : ''}
+
+                    ${metadata.learningObjectives && metadata.learningObjectives.length > 0 ? `
+                    <div class="bg-white/10 rounded-xl p-4 mb-4">
+                        <h3 class="text-white font-semibold mb-2 flex items-center gap-2">
+                            <span>🎯</span> Learning Objectives
+                        </h3>
+                        <ul class="space-y-1">
+                            ${metadata.learningObjectives.map(obj => `
+                                <li class="text-white/80 text-sm flex items-start gap-2">
+                                    <span class="text-green-400 mt-0.5">✓</span>
+                                    <span>${escapeHtml(obj)}</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>` : ''}
+
+                    ${metadata.prerequisites && metadata.prerequisites.length > 0 ? `
+                    <div class="bg-white/10 rounded-xl p-4 mb-4">
+                        <h3 class="text-white font-semibold mb-2 flex items-center gap-2">
+                            <span>📋</span> Prerequisites
+                        </h3>
+                        <div class="flex flex-wrap gap-2">
+                            ${metadata.prerequisites.map(prereq => `
+                                <span class="px-2 py-1 bg-white/10 rounded text-white/80 text-xs">${escapeHtml(prereq)}</span>
+                            `).join('')}
+                        </div>
+                    </div>` : ''}
+
                     <div class="mt-4 flex items-center gap-2">
                         ${Array.from({length: totalPages}, (_, i) => `
                             <div class="h-2 ${i === currentPage ? 'w-8 bg-white' : 'w-2 bg-white/30'} rounded-full transition-all"></div>
@@ -594,6 +712,18 @@ Return ONLY the JSON object, no markdown formatting or code blocks.`;
                         return `
                             <div class="bg-yellow-500/20 border-l-4 border-yellow-400 p-4 rounded-r-xl">
                                 <p class="text-yellow-100 font-medium">${escapeHtml(item.text)}</p>
+                            </div>
+                        `;
+                    case 'image':
+                        return `
+                            <div class="my-6 rounded-xl overflow-hidden border border-white/10">
+                                <img
+                                    src="${escapeHtml(item.url)}"
+                                    alt="${escapeHtml(item.alt || 'Lesson image')}"
+                                    class="w-full h-auto"
+                                    onerror="this.parentElement.innerHTML='<div class=\\'bg-white/5 p-8 text-center text-white/60\\'>Image could not be loaded</div>'"
+                                />
+                                ${item.alt ? `<p class="bg-white/5 px-4 py-2 text-white/70 text-sm">${escapeHtml(item.alt)}</p>` : ''}
                             </div>
                         `;
                     default:
