@@ -207,36 +207,9 @@
         @keyframes pageIntro {
             0% {
                 opacity: 0;
-                transform: scale(0.98);
             }
             100% {
                 opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        /* Curtain reveal effect */
-        body::after {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to bottom, #0a0a1a, #1e1b4b);
-            z-index: 10000;
-            pointer-events: none;
-            animation: curtainReveal 1s ease-out forwards;
-        }
-
-        @keyframes curtainReveal {
-            0% {
-                transform: translateY(0);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-100%);
-                opacity: 0;
             }
         }
 
@@ -275,6 +248,22 @@
             opacity: 1;
             transform: translateY(0);
         }
+
+        /* Header fade-in */
+        header {
+            animation: headerFadeIn 1.5s ease-out 0.5s both;
+        }
+
+        @keyframes headerFadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 <body class="font-sans antialiased">
@@ -284,7 +273,7 @@
     <div class="floating-shape" style="width: 350px; height: 350px; background: linear-gradient(135deg, #a78bfa, #0ea5a4); bottom: 10%; left: 50%; animation-delay: 10s;"></div>
 
     <!-- Header -->
-    <header class="fixed top-0 left-0 right-0 z-50 p-6 md:p-8" style="backdrop-filter: blur(20px); background: rgba(10, 10, 26, 0.8); border-bottom: 1px solid rgba(255,255,255,0.08);">
+    <header class="fixed top-0 left-0 right-0 z-50 p-6 md:p-8" style="backdrop-filter: blur(20px); background: rgba(10, 10, 26, 0.4); border-bottom: 1px solid rgba(255,255,255,0.05);">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <a href="/" class="text-2xl font-bold text-white flex items-center gap-2">
                 <span class="text-3xl">🎓</span>
@@ -305,7 +294,7 @@
     <section class="min-h-screen flex items-center justify-center px-4 pt-24 pb-12">
         <div class="max-w-6xl mx-auto text-center">
             <!-- Eyebrow -->
-            <div class="mb-6 animate-fadeInUp">
+            <div id="hero-eyebrow" class="mb-6 delayed-fade-in">
                 <span class="inline-block px-4 py-2 rounded-full text-sm font-semibold"
                       style="background: linear-gradient(135deg, rgba(168, 139, 250, 0.2), rgba(14, 165, 164, 0.2)); border: 1px solid rgba(168, 139, 250, 0.3); color: #a78bfa;">
                     ✨ AI-Powered Learning Platform
@@ -313,7 +302,7 @@
             </div>
 
             <!-- Main Headline -->
-            <h1 id="hero-headline" class="text-5xl md:text-7xl font-black mb-6 hero-gradient-text typewriter-cursor" style="line-height: 1.1; min-height: 180px;">
+            <h1 id="hero-headline" class="text-5xl md:text-7xl font-black mb-6 hero-gradient-text typewriter-cursor" style="line-height: 1.1;">
                 <span id="typewriter-text"></span>
             </h1>
 
@@ -875,7 +864,7 @@
 
     <!-- Typewriter Effect -->
     <script>
-        // Wait for curtain reveal to finish, then start typewriter
+        // Start typewriter after page loads
         setTimeout(() => {
             const text = "Studying built for\nevery kind of learner.";
             const typewriterElement = document.getElementById('typewriter-text');
@@ -903,23 +892,27 @@
                     setTimeout(() => {
                         headlineElement.classList.remove('typewriter-cursor');
 
-                        // Fade in the rest of the hero content
-                        document.getElementById('hero-subtitle').classList.add('show');
+                        // Fade in the rest of the hero content sequentially
+                        document.getElementById('hero-eyebrow').classList.add('show');
+
+                        setTimeout(() => {
+                            document.getElementById('hero-subtitle').classList.add('show');
+                        }, 100);
 
                         setTimeout(() => {
                             document.getElementById('hero-auth-section').classList.add('show');
-                        }, 200);
+                        }, 300);
 
                         setTimeout(() => {
                             document.getElementById('trust-indicators').classList.add('show');
-                        }, 400);
-                    }, 500);
+                        }, 500);
+                    }, 300);
                 }
             }
 
             // Start typing
             typeWriter();
-        }, 1000); // Wait for curtain reveal (1s)
+        }, 600); // Brief delay after page loads
     </script>
 
     <!-- 3D Card Tilt Effect -->
