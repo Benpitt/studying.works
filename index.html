@@ -245,6 +245,36 @@
             background-size: 200% 200%;
             transition: background-position 0.3s ease-out;
         }
+
+        /* Typewriter effect */
+        .typewriter {
+            overflow: hidden;
+            white-space: nowrap;
+            display: inline-block;
+        }
+
+        .typewriter-cursor::after {
+            content: '|';
+            animation: blink 1s step-end infinite;
+            margin-left: 4px;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        /* Initially hide elements that will fade in after typewriter */
+        .delayed-fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .delayed-fade-in.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body class="font-sans antialiased">
@@ -283,18 +313,18 @@
             </div>
 
             <!-- Main Headline -->
-            <h1 class="text-5xl md:text-7xl font-black mb-6 hero-gradient-text animate-fadeInUp" style="animation-delay: 0.1s; line-height: 1.1;">
-                Studying built for<br>every kind of learner.
+            <h1 id="hero-headline" class="text-5xl md:text-7xl font-black mb-6 hero-gradient-text typewriter-cursor" style="line-height: 1.1; min-height: 180px;">
+                <span id="typewriter-text"></span>
             </h1>
 
             <!-- Subtitle -->
-            <p class="hero-subtitle max-w-3xl mx-auto mb-12 animate-fadeInUp" style="animation-delay: 0.2s;">
+            <p id="hero-subtitle" class="hero-subtitle max-w-3xl mx-auto mb-12 delayed-fade-in">
                 Transform your study sessions with AI-powered flashcards, adaptive learning algorithms, and personalized practice.
                 <strong class="text-white">100% free</strong> and <strong class="text-white">open-source</strong>
             </p>
 
             <!-- Auth Buttons -->
-            <div id="hero-auth-section" class="animate-fadeInUp" style="animation-delay: 0.3s;">
+            <div id="hero-auth-section" class="delayed-fade-in">
                 <div id="hero-auth-buttons">
                     <button id="hero-google-signin-btn" class="google-signin-btn">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -318,7 +348,7 @@
             </div>
 
             <!-- Trust Indicators -->
-            <div class="mt-12 flex flex-wrap items-center justify-center gap-6 text-white/60 text-sm animate-fadeInUp" style="animation-delay: 0.4s;">
+            <div id="trust-indicators" class="mt-12 flex flex-wrap items-center justify-center gap-6 text-white/60 text-sm delayed-fade-in">
                 <div class="flex items-center gap-2">
                     <span class="text-green-400">✓</span>
                     <span>No credit card required</span>
@@ -842,6 +872,55 @@
             perspective: 1000px;
         }
     </style>
+
+    <!-- Typewriter Effect -->
+    <script>
+        // Wait for curtain reveal to finish, then start typewriter
+        setTimeout(() => {
+            const text = "Studying built for\nevery kind of learner.";
+            const typewriterElement = document.getElementById('typewriter-text');
+            const headlineElement = document.getElementById('hero-headline');
+            let charIndex = 0;
+            let lineBreakAdded = false;
+
+            function typeWriter() {
+                if (charIndex < text.length) {
+                    const currentChar = text.charAt(charIndex);
+
+                    if (currentChar === '\n' && !lineBreakAdded) {
+                        // Add line break
+                        typewriterElement.innerHTML += '<br>';
+                        lineBreakAdded = true;
+                    } else if (currentChar !== '\n') {
+                        typewriterElement.textContent += currentChar;
+                    }
+
+                    charIndex++;
+                    // Faster typing speed (50ms per character)
+                    setTimeout(typeWriter, 50);
+                } else {
+                    // Typewriter finished - remove blinking cursor and show rest of content
+                    setTimeout(() => {
+                        headlineElement.classList.remove('typewriter-cursor');
+
+                        // Fade in the rest of the hero content
+                        document.getElementById('hero-subtitle').classList.add('show');
+
+                        setTimeout(() => {
+                            document.getElementById('hero-auth-section').classList.add('show');
+                        }, 200);
+
+                        setTimeout(() => {
+                            document.getElementById('trust-indicators').classList.add('show');
+                        }, 400);
+                    }, 500);
+                }
+            }
+
+            // Start typing
+            typeWriter();
+        }, 1000); // Wait for curtain reveal (1s)
+    </script>
 
     <!-- 3D Card Tilt Effect -->
     <script>
