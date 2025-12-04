@@ -265,8 +265,26 @@
             }
         }
     </style>
+
+    <!-- Force scroll to top on page load -->
+    <script>
+        // Prevent browser from restoring scroll position
+        if (history.scrollRestoration) {
+            history.scrollRestoration = 'manual';
+        }
+        // Immediately scroll to top
+        window.scrollTo(0, 0);
+    </script>
 </head>
 <body class="font-sans antialiased">
+    <!-- Force page to start at top -->
+    <script>
+        // Scroll to top on page load
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+    </script>
+
     <!-- Floating Background Shapes -->
     <div class="floating-shape" style="width: 400px; height: 400px; background: linear-gradient(135deg, #a78bfa, #6366f1); top: 10%; left: 10%; animation-delay: 0s;"></div>
     <div class="floating-shape" style="width: 300px; height: 300px; background: linear-gradient(135deg, #0ea5a4, #134e4a); top: 50%; right: 10%; animation-delay: 5s;"></div>
@@ -826,6 +844,13 @@
                     target.scrollIntoView({ behavior: 'smooth' });
                 }
             });
+        });
+
+        // Ensure page is at top when fully loaded
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+            }, 0);
         });
     </script>
 
